@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0b0f14;--panel:#121826;--ink:#e6edf6;--muted:#a8b3c5;--accent:#7b6cff;--ok:#36d399;--danger:#ff5565}
+  :root{--bg:#0b0f14;--panel:#121826;--ink:#e6edf6;--muted:#a8b3c5;--accent:#7b6cff}
   *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
   header{padding:18px 20px;border-bottom:1px solid #1d2533;background:linear-gradient(180deg,#111827 0,#0d1320 100%)}
   h1{margin:0;font-size:20px}
@@ -21,9 +21,11 @@
   .mini{font-size:12px;color:var(--muted)}
   canvas{background:#0e1523;border:1px solid #1d2533;border-radius:12px;padding:8px}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<!-- Libraries loaded with defer so they don’t block clicks -->
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
 <header><h1>Learning Maturity Panel</h1></header>
@@ -32,9 +34,9 @@
   <div class="card">
     <h2>Start</h2>
     <div class="grid">
-      <button id="btn-all">Run all four domains</button>
-      <button id="btn-single" class="outline">Run a single domain</button>
-      <button id="btn-custom" class="outline">Run a custom set</button>
+      <button onclick="startRun('all')">Run all four domains</button>
+      <button class="outline" onclick="startRun('single')">Run a single domain</button>
+      <button class="outline" onclick="startRun('custom')">Run a custom set</button>
     </div>
     <p class="mini">Scale: 1–5 (1=Strongly Disagree … 5=Strongly Agree). Coverage = % of items ≥4. Low = % ≤2.</p>
   </div>
@@ -44,7 +46,7 @@
 </main>
 
 <script>
-/* ---------- Level description text (short form) ---------- */
+/* ------------ Level text (concise) ------------ */
 const LEVEL_TEXT = {
   "Business Alignment": {
     1:{t:"Level 1 – Reactive",d:"Order-taking; start capturing business drivers & baseline data."},
@@ -76,7 +78,7 @@ const LEVEL_TEXT = {
   }
 };
 
-/* ---------- Domain definitions, items & groupings ---------- */
+/* ------------ Domains & groups ------------ */
 const DOMAINS = {
   "Business Alignment": {
     items:11,
@@ -116,39 +118,32 @@ const DOMAINS = {
   }
 };
 
-/* ---------- Scoring rules ---------- */
-// Average bands
+/* ------------ Scoring rules ------------ */
 function LAVG(avg){ if(avg<2.7) return 1; if(avg<3.5) return 2; if(avg<4.1) return 3; if(avg<4.6) return 4; return 5; }
-// Coverage bands (pass at >30%; bands used for level)
 function LCOV(c){ if(c<0.3) return 1; if(c<0.5) return 2; if(c<0.7) return 3; if(c<0.85) return 4; return 5; }
-// Low-scores stackable thresholds → highest applicable
+// Low-scores stackable thresholds (highest applicable)
 function LLOW(p){
   let lvl=0;
-  if(p===0) lvl=Math.max(lvl,4);
-  if(p>0.15) lvl=Math.max(lvl,3);
-  if(p>0.20) lvl=Math.max(lvl,2);
-  if(p>0.40) lvl=Math.max(lvl,1);
-  if(lvl===0) lvl=3; // 0 < p ≤ 0.15
+  if(p===0) lvl=Math.max(lvl,4);      // L4
+  if(p>0.15) lvl=Math.max(lvl,3);     // L3
+  if(p>0.20) lvl=Math.max(lvl,2);     // L2
+  if(p>0.40) lvl=Math.max(lvl,1);     // L1
+  if(lvl===0) lvl=3;                  // 0 < p ≤ 0.15
   return lvl;
 }
-// Contingency upgrader (edit to mirror D43/D44 if desired)
+// Optional contingency upgrader (edit if you want to mirror D43/D44 exactly)
 function contingencyUpgrade({avg,cov,plow,lavg,lcov,llow}){
   if(avg>=4.1 && cov>=0.70 && plow<=0.15) return 4;
   if(avg>=3.5 && cov>=0.50 && llow>=2) return 3;
   return null;
 }
 
-/* ---------- Flow state ---------- */
+/* ------------ Flow state & helpers ------------ */
 let runQueue=[], sessionResults=[];
-const ui = document.getElementById('ui');
-const reports = document.getElementById('reports');
-
-document.getElementById('btn-all').addEventListener('click', ()=>startRun('all'));
-document.getElementById('btn-single').addEventListener('click', ()=>startRun('single'));
-document.getElementById('btn-custom').addEventListener('click', ()=>startRun('custom'));
+const $ = sel => document.querySelector(sel);
+const ui = $('#ui'); const reports = $('#reports');
 
 function startRun(mode){
-  // reset session state
   sessionResults=[]; ui.innerHTML=''; reports.innerHTML='';
   if(mode==='all'){
     runQueue = Object.keys(DOMAINS);
@@ -167,14 +162,16 @@ function pickDomainsUI(multi){
     <div class="card">
       <h2>Select ${multi?'one or more':'a'} domain${multi?'s':''}</h2>
       ${inputs}
-      <div style="margin-top:10px"><button class="outline" onclick="confirmDomainPick(${multi})">Continue</button></div>
+      <div style="margin-top:10px">
+        <button class="outline" onclick="confirmDomainPick(${multi})">Continue</button>
+      </div>
     </div>`;
 }
 
 function confirmDomainPick(multi){
-  const checked = [...document.querySelectorAll('input[name="dompick"]:checked')].map(x=>x.value);
-  if(checked.length===0) return alert('Pick at least one domain.');
-  runQueue = checked;
+  const picked = [...document.querySelectorAll('input[name="dompick"]')].filter(x=>x.checked).map(x=>x.value);
+  if(picked.length===0){ alert('Pick at least one domain.'); return; }
+  runQueue = picked;
   nextDomain();
 }
 
@@ -189,9 +186,9 @@ function renderDomainForm(domain){
   let qs='';
   for(let i=1;i<=cfg.items;i++){
     qs += `<label>Q${i}
-              <select id="q-${domain}-${i}">
-                <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option>
-              </select>
+            <select id="q-${domain}-${i}">
+              <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option>
+            </select>
            </label>`;
   }
   ui.innerHTML = `
@@ -201,7 +198,9 @@ function renderDomainForm(domain){
         <span class="mini">Progress: ${Object.keys(DOMAINS).indexOf(domain)+1} / ${Object.keys(DOMAINS).length}</span>
       </div>
       <div class="grid">${qs}</div>
-      <div style="margin-top:12px"><button onclick="scoreDomain('${domain}')">Score domain</button></div>
+      <div style="margin-top:12px">
+        <button onclick="scoreDomain('${domain}')">Score domain</button>
+      </div>
     </div>`;
 }
 
@@ -213,8 +212,9 @@ function scoreDomain(domain){
   const cov = ratings.filter(x=>x>=4).length/n;
   const lowCount = ratings.filter(x=>x<=2).length;
   const plow = lowCount/n;
+
   const lavg=LAVG(avg), lcov=LCOV(cov), llow=LLOW(plow);
-  const provisional = Math.min(lavg,lcov,llow);
+  const provisional = Math.min(lavg, lcov, llow);
   const cont = contingencyUpgrade({avg,cov,plow,lavg,lcov,llow});
   const finalLevel = cont ? Math.max(provisional, cont) : provisional;
 
@@ -222,7 +222,7 @@ function scoreDomain(domain){
   const groupScores={};
   for(const [g,idxs] of Object.entries(cfg.groups)){
     const vals = idxs.map(i=>ratings[i-1]);
-    groupScores[g]= vals.reduce((a,b)=>a+b,0)/vals.length;
+    groupScores[g] = vals.reduce((a,b)=>a+b,0)/vals.length;
   }
 
   sessionResults.push({domain,ratings,avg,cov,lowCount,plow,lavg,lcov,llow,provisional,contingency:cont,finalLevel,groupScores});
@@ -233,7 +233,7 @@ function scoreDomain(domain){
 function renderDomainReportCard(res){
   const card = document.createElement('div');
   card.className='card';
-  const meta = LEVEL_TEXT[res.domain][res.finalLevel] || {t:`Level ${res.finalLevel}`, d:''};
+  const meta = (LEVEL_TEXT[res.domain]||{})[res.finalLevel] || {t:`Level ${res.finalLevel}`, d:''};
   const canvasId = `radar-${res.domain.replace(/\s/g,'')}-${Math.random().toString(36).slice(2)}`;
   card.innerHTML = `
     <h3>${res.domain} — <b>${meta.t}</b></h3>
@@ -249,8 +249,10 @@ function renderDomainReportCard(res){
       </div>
       <div><canvas id="${canvasId}" width="340" height="260"></canvas></div>
     </div>`;
-  reports.appendChild(card);
-  drawRadar(canvasId,res.groupScores);
+  document.getElementById('reports').appendChild(card);
+  // if Chart not yet loaded, draw after it is
+  if (window.Chart) drawRadar(canvasId, res.groupScores);
+  else window.addEventListener('load', ()=>drawRadar(canvasId, res.groupScores), {once:true});
 }
 
 function drawRadar(id, groupScores){
@@ -286,8 +288,9 @@ function summaryTable(results){
   }</table>`;
 }
 
-/* ---------- Exports ---------- */
+/* ------------ Exports ------------ */
 async function exportPDF(){
+  if(!window.jspdf || !window.html2canvas){ alert('PDF libs not loaded yet. Try again in a second.'); return; }
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({unit:'pt',format:'a4'});
   const node = document.body;
@@ -303,7 +306,8 @@ async function exportPDF(){
 function exportCSV(){
   const rows=[['Domain','Average','Coverage','Low%','Final Level']];
   sessionResults.forEach(r=>rows.push([r.domain,r.avg.toFixed(2),(r.cov*100).toFixed(0)+'%',(r.plow*100).toFixed(0)+'%',r.finalLevel]));
-  const csv=rows.map(r=>r.join(',')).join('\n'); download('Learning-Maturity-Report.csv',csv,'text/csv');
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  download('Learning-Maturity-Report.csv',csv,'text/csv');
 }
 function exportMD(){
   let md='# Learning Maturity Report\n\n| Domain | Avg | Coverage | Low% | Final |\n|---|---:|---:|---:|---:|\n';
@@ -316,4 +320,3 @@ function download(name,text,type){
 </script>
 </body>
 </html>
-
