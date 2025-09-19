@@ -1,76 +1,42 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Learning Maturity Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Minimal, accessible styling -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0b0f14; --panel:#121826; --ink:#e6edf6; --muted:#a8b3c5;
-      --teal:#00c2a8; --blue:#4aa8ff; --orange:#ff8b3d; --green:#5ad36b;
-      --accent:#7b6cff; --danger:#ff5565; --ok:#36d399;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;}
-    header{padding:18px 20px;border-bottom:1px solid #1d2533;background:linear-gradient(180deg,#111827 0,#0d1320 100%)}
-    h1{margin:0;font-size:20px;letter-spacing:.2px}
-    main{max-width:1100px;margin:24px auto;padding:0 16px 64px}
-    .card{background:var(--panel);border:1px solid #1d2533;border-radius:14px;padding:18px;margin:16px 0}
-    .row{display:flex;flex-wrap:wrap;gap:12px}
-    .col{flex:1 1 300px}
-    button,.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
-    .ghost{background:#1b2333;color:var(--ink)}
-    .outline{background:transparent;border:1px solid #2c3750}
-    select,input,textarea{width:100%;background:#0f1625;color:var(--ink);border:1px solid #22304b;border-radius:10px;padding:10px}
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    th,td{padding:10px;border-bottom:1px solid #22304b;text-align:left;vertical-align:top}
-    .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #22304b;color:var(--muted)}
-    .ok{color:var(--ok)} .bad{color:var(--danger)}
-    .mini{font-size:12px;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-    .lvl{font-weight:700}
-    canvas{background:#0e1523;border:1px solid #1d2533;border-radius:12px;padding:8px}
-    .center{display:flex;gap:8px;align-items:center}
-    .hidden{display:none}
-    code{background:#0e1523;border:1px solid #1d2533;padding:2px 6px;border-radius:6px}
-  </style>
-
-  <!-- Charts & PDF -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<meta charset="utf-8" />
+<title>Learning Maturity Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b0f14;--panel:#121826;--ink:#e6edf6;--muted:#a8b3c5;--accent:#7b6cff;--ok:#36d399;--danger:#ff5565}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  header{padding:18px 20px;border-bottom:1px solid #1d2533;background:linear-gradient(180deg,#111827 0,#0d1320 100%)}
+  h1{margin:0;font-size:20px}
+  main{max-width:1100px;margin:24px auto;padding:0 16px 64px}
+  .card{background:var(--panel);border:1px solid #1d2533;border-radius:14px;padding:18px;margin:16px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  button{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+  .outline{background:transparent;border:1px solid #2c3750}
+  select{width:100%;background:#0f1625;color:var(--ink);border:1px solid #22304b;border-radius:10px;padding:10px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:10px;border-bottom:1px solid #22304b;text-align:left}
+  .mini{font-size:12px;color:var(--muted)}
+  canvas{background:#0e1523;border:1px solid #1d2533;border-radius:12px;padding:8px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
-<header class="center">
-  <h1>Learning Maturity Panel</h1>
-  <span class="tag">v1 • client testing</span>
-</header>
+<header><h1>Learning Maturity Panel</h1></header>
 
 <main>
   <div class="card">
-    <div class="row">
-      <div class="col">
-        <h2>Start</h2>
-        <div class="grid">
-          <button onclick="startRun('all')">Run all four domains</button>
-          <button class="ghost" onclick="startRun('single')">Run a single domain</button>
-          <button class="outline" onclick="startRun('custom')">Run a custom set</button>
-        </div>
-        <p class="mini">Scale: 1–5 (1=Strongly Disagree … 5=Strongly Agree). Coverage = % of items rated ≥4. Low = % rated ≤2.</p>
-      </div>
-      <div class="col">
-        <h2>Export</h2>
-        <div class="grid">
-          <button class="outline" onclick="exportPDF()">Export as PDF</button>
-          <button class="outline" onclick="exportCSV()">Export as CSV</button>
-          <button class="outline" onclick="exportMD()">Export as Markdown</button>
-        </div>
-        <p class="mini">A server endpoint may be added to silently email reports to cade.wilson@gomindspring.com (see <code>sendSilentEmail</code>).</p>
-      </div>
+    <h2>Start</h2>
+    <div class="grid">
+      <button id="btn-all">Run all four domains</button>
+      <button id="btn-single" class="outline">Run a single domain</button>
+      <button id="btn-custom" class="outline">Run a custom set</button>
     </div>
+    <p class="mini">Scale: 1–5 (1=Strongly Disagree … 5=Strongly Agree). Coverage = % of items ≥4. Low = % ≤2.</p>
   </div>
 
   <div id="ui"></div>
@@ -78,375 +44,276 @@
 </main>
 
 <script>
-/* ================================
-   CONFIG: DOMAINS, GROUPS, TEXT
-==================================*/
-
-const DOMAINS = {
-  "Business Alignment": {
-    items: 11,
-    groups: {
-      "Identifying Business Problems & Gaps": [1,2,3,4],
-      "Understanding External & Environmental Context": [5,6],
-      "Data & Measurement": [7,8],
-      "Contribution & Value of Learning": [9,10,11],
-    },
-    descriptions: lvlDescriptions.BusinessAlignment
-  },
-  "Performance Clarity": {
-    items: 9,
-    groups: {
-      "Defining Performance Expectations": [1,2,3,4],
-      "Measuring Performance Capability": [5,6],
-      "Assessing Performance Impact": [7],
-      "Identifying Barriers & Enablers": [8,9],
-    },
-    descriptions: lvlDescriptions.PerformanceClarity
-  },
-  "Learning Effectiveness": {
-    items: 9,
-    groups: {
-      "Performance Levels & Goals": [1,2,3],
-      "Skill & Knowledge Transfer": [4,5,6],
-      "Learning Design & Delivery": [7],
-      "Measurement & Feedback": [8,9],
-    },
-    descriptions: lvlDescriptions.LearningEffectiveness
-  },
-  "Learner Insight": {
-    items: 12,
-    groups: {
-      "Learner Profile & Context": [1,2,3],
-      "Training History & Effectiveness": [4,5],
-      "Attitudes & Reactions": [6,7,8],
-      "Learning Conditions & Support": [9,10,11,12],
-    },
-    descriptions: lvlDescriptions.LearnerInsight
-  }
-};
-
-// Level descriptions (from your text)
+/* ---------- Level description text (short form) ---------- */
 const LEVEL_TEXT = {
   "Business Alignment": {
-    1: {t:"Level 1 – Reactive", d:"L&D is an order-taker... Build basic awareness of business drivers and start collecting baseline data."},
-    2: {t:"Level 2 – Emerging", d:"Early attempts link learning with goals... Standardize a process for connecting requests to needs."},
-    3: {t:"Level 3 – Defined", d:"L&D consistently integrates business goals... Formalize alignment practices and strengthen governance."},
-    4: {t:"Level 4 – Managed", d:"L&D is a recognized partner... Embed alignment into planning cycles and use data proactively."},
-    5: {t:"Level 5 – Optimizing", d:"L&D is a strategic driver... Scale best practices and leverage predictive analytics."}
+    1:{t:"Level 1 – Reactive",d:"Order-taking; start capturing business drivers & baseline data."},
+    2:{t:"Level 2 – Emerging",d:"Early, inconsistent alignment; standardize intake to business needs."},
+    3:{t:"Level 3 – Defined",d:"Goals consistently integrated; formalize alignment & governance."},
+    4:{t:"Level 4 – Managed",d:"Recognized strategic partner; embed alignment into planning cycles."},
+    5:{t:"Level 5 – Optimizing",d:"Strategic driver; predictive analytics steer strategy."}
   },
   "Performance Clarity": {
-    1:{t:"Level 1 – Reactive", d:"Little shared understanding... Begin documenting what good looks like and gaps."},
-    2:{t:"Level 2 – Emerging", d:"Initial attempts to clarify... Build consistent processes for defining outputs and measuring skills."},
-    3:{t:"Level 3 – Defined", d:"Expectations documented and understood... Standardize measurement and ensure consistency."},
-    4:{t:"Level 4 – Managed", d:"Expectations integrated into management practices... Embed clarity into talent and improvement cycles."},
-    5:{t:"Level 5 – Optimizing", d:"Clarity is a core capability... Use predictive analytics and continuous improvement."}
+    1:{t:"Level 1 – Reactive",d:"Little shared understanding; define what good looks like."},
+    2:{t:"Level 2 – Emerging",d:"Inconsistent clarity; build processes for outputs & skills."},
+    3:{t:"Level 3 – Defined",d:"Expectations documented & measured consistently."},
+    4:{t:"Level 4 – Managed",d:"Integrated into management & decisions; root causes addressed."},
+    5:{t:"Level 5 – Optimizing",d:"Proactive clarity with predictive insights."}
   },
   "Learning Effectiveness": {
-    1:{t:"Level 1 – Reactive", d:"Effectiveness is assumed... Establish baseline goals and feedback collection."},
-    2:{t:"Level 2 – Emerging", d:"Some efforts link learning with performance... Build consistency in goals, modalities, pre-role prep."},
-    3:{t:"Level 3 – Defined", d:"Consistent processes to design, deliver, and measure... Formalize outcome measurement and transfer support."},
-    4:{t:"Level 4 – Managed", d:"Effectiveness integrated with performance mgmt... Embed measurement into business cycles; use predictive data."},
-    5:{t:"Level 5 – Optimizing", d:"Continuously improved, shaping capability... Leverage analytics and innovation."}
+    1:{t:"Level 1 – Reactive",d:"Effectiveness assumed; set baseline goals & feedback."},
+    2:{t:"Level 2 – Emerging",d:"Informal links to performance; improve consistency & prep."},
+    3:{t:"Level 3 – Defined",d:"Consistent design/delivery/measurement; formalize outcomes."},
+    4:{t:"Level 4 – Managed",d:"Integrated with performance mgmt; predictive data informs design."},
+    5:{t:"Level 5 – Optimizing",d:"Continuously improved, adaptive, strategic."}
   },
   "Learner Insight": {
-    1:{t:"Level 1 – Reactive", d:"Little understanding of learners... Begin capturing profiles and feedback."},
-    2:{t:"Level 2 – Emerging", d:"Some information collected... Formalize processes for expectations and experiences."},
-    3:{t:"Level 3 – Defined", d:"Insights systematically gathered and used... Standardize needs assessment and feedback loop."},
-    4:{t:"Level 4 – Managed", d:"Insights integrated into planning and delivery... Embed analysis into intake/design; mitigate barriers."},
-    5:{t:"Level 5 – Optimizing", d:"Insights drive personalization and predictive design... Use analytics to continuously enhance learning."}
+    1:{t:"Level 1 – Reactive",d:"Limited view of learners; start profiles & feedback."},
+    2:{t:"Level 2 – Emerging",d:"Some data, inconsistent use; formalize capture & use."},
+    3:{t:"Level 3 – Defined",d:"Systematic insights inform design; close the loop."},
+    4:{t:"Level 4 – Managed",d:"Insights embedded in planning; barriers mitigated."},
+    5:{t:"Level 5 – Optimizing",d:"Personalized & predictive learner design."}
   }
 };
 
-/* ================================
-   SCORING LOGIC
-==================================*/
+/* ---------- Domain definitions, items & groupings ---------- */
+const DOMAINS = {
+  "Business Alignment": {
+    items:11,
+    groups:{
+      "Identifying Business Problems & Gaps":[1,2,3,4],
+      "Understanding External & Environmental Context":[5,6],
+      "Data & Measurement":[7,8],
+      "Contribution & Value of Learning":[9,10,11]
+    }
+  },
+  "Performance Clarity": {
+    items:9,
+    groups:{
+      "Defining Performance Expectations":[1,2,3,4],
+      "Measuring Performance Capability":[5,6],
+      "Assessing Performance Impact":[7],
+      "Identifying Barriers & Enablers":[8,9]
+    }
+  },
+  "Learning Effectiveness": {
+    items:9,
+    groups:{
+      "Performance Levels & Goals":[1,2,3],
+      "Skill & Knowledge Transfer":[4,5,6],
+      "Learning Design & Delivery":[7],
+      "Measurement & Feedback":[8,9]
+    }
+  },
+  "Learner Insight": {
+    items:12,
+    groups:{
+      "Learner Profile & Context":[1,2,3],
+      "Training History & Effectiveness":[4,5],
+      "Attitudes & Reactions":[6,7,8],
+      "Learning Conditions & Support":[9,10,11,12]
+    }
+  }
+};
 
-// Average bands (fallback if you want to tweak later)
-function LAVG(avg){
-  if(avg < 2.7) return 1;
-  if(avg < 3.5) return 2;
-  if(avg < 4.1) return 3;
-  if(avg < 4.6) return 4;
-  return 5;
-}
-
-// Coverage bands (fallback); pass rule uses >30%
-function LCOV(cov){
-  if(cov < 0.3) return 1;
-  if(cov < 0.5) return 2;
-  if(cov < 0.7) return 3;
-  if(cov < 0.85) return 4;
-  return 5;
-}
-
-// Low-scores (stackable thresholds; pick HIGHEST applicable)
-// PLOW = <=2 count / N
-function LLOW(plow){
-  let lvl = 0;
-  if(plow === 0) lvl = Math.max(lvl,4);           // Level 4
-  if(plow > 0.15) lvl = Math.max(lvl,3);          // Level 3
-  if(plow > 0.20) lvl = Math.max(lvl,2);          // Level 2
-  if(plow > 0.40) lvl = Math.max(lvl,1);          // Level 1
-  if(lvl === 0) lvl = 3;                          // 0 < PLOW ≤ 0.15 → Level 3
+/* ---------- Scoring rules ---------- */
+// Average bands
+function LAVG(avg){ if(avg<2.7) return 1; if(avg<3.5) return 2; if(avg<4.1) return 3; if(avg<4.6) return 4; return 5; }
+// Coverage bands (pass at >30%; bands used for level)
+function LCOV(c){ if(c<0.3) return 1; if(c<0.5) return 2; if(c<0.7) return 3; if(c<0.85) return 4; return 5; }
+// Low-scores stackable thresholds → highest applicable
+function LLOW(p){
+  let lvl=0;
+  if(p===0) lvl=Math.max(lvl,4);
+  if(p>0.15) lvl=Math.max(lvl,3);
+  if(p>0.20) lvl=Math.max(lvl,2);
+  if(p>0.40) lvl=Math.max(lvl,1);
+  if(lvl===0) lvl=3; // 0 < p ≤ 0.15
   return lvl;
 }
-
-// Optional contingency upgrader (edit to mirror your D43/D44)
-// Returns candidate level; final = max(provisional, candidate)
-function contingencyUpgrade({avg, cov, plow, lavg, lcov, llow}){
-  // Examples:
-  if(avg >= 4.1 && cov >= 0.70 && plow <= 0.15) return 4;
-  if(avg >= 3.5 && cov >= 0.50 && llow >= 2) return 3;
-  return null; // no change
+// Contingency upgrader (edit to mirror D43/D44 if desired)
+function contingencyUpgrade({avg,cov,plow,lavg,lcov,llow}){
+  if(avg>=4.1 && cov>=0.70 && plow<=0.15) return 4;
+  if(avg>=3.5 && cov>=0.50 && llow>=2) return 3;
+  return null;
 }
 
-/* ================================
-   UI + FLOW
-==================================*/
+/* ---------- Flow state ---------- */
+let runQueue=[], sessionResults=[];
+const ui = document.getElementById('ui');
+const reports = document.getElementById('reports');
 
-let runQueue = [];
+document.getElementById('btn-all').addEventListener('click', ()=>startRun('all'));
+document.getElementById('btn-single').addEventListener('click', ()=>startRun('single'));
+document.getElementById('btn-custom').addEventListener('click', ()=>startRun('custom'));
 
 function startRun(mode){
-  const ui = document.getElementById('ui');
-  ui.innerHTML = '';
-  if(mode === 'all'){
+  // reset session state
+  sessionResults=[]; ui.innerHTML=''; reports.innerHTML='';
+  if(mode==='all'){
     runQueue = Object.keys(DOMAINS);
     nextDomain();
-  } else if(mode === 'single'){
-    ui.innerHTML = pickDomainsUI(false);
-  } else {
-    ui.innerHTML = pickDomainsUI(true);
+  }else{
+    ui.innerHTML = pickDomainsUI(mode==='custom');
   }
 }
 
 function pickDomainsUI(multi){
-  const domains = Object.keys(DOMAINS).map(d=>`
-    <label class="center" style="gap:8px">
-      <input type="${multi?'checkbox':'radio'}" name="dompick" value="${d}">
-      ${d}
+  const inputs = Object.keys(DOMAINS).map(d=>`
+    <label style="display:flex;gap:8px;align-items:center;margin:6px 0">
+      <input type="${multi?'checkbox':'radio'}" name="dompick" value="${d}"> ${d}
     </label>`).join('');
   return `
     <div class="card">
-      <h2>Select ${multi?'one or more':'a domain'}</h2>
-      ${domains}
-      <div style="margin-top:10px">
-        <button onclick="confirmDomainPick(${multi})">Continue</button>
-      </div>
+      <h2>Select ${multi?'one or more':'a'} domain${multi?'s':''}</h2>
+      ${inputs}
+      <div style="margin-top:10px"><button class="outline" onclick="confirmDomainPick(${multi})">Continue</button></div>
     </div>`;
 }
 
 function confirmDomainPick(multi){
-  const picked = [...document.querySelectorAll('input[name="dompick"]:checked, input[name="dompick"]:radio:checked')].map(x=>x.value);
-  if(picked.length===0) return alert('Pick at least one domain.');
-  runQueue = picked;
+  const checked = [...document.querySelectorAll('input[name="dompick"]:checked')].map(x=>x.value);
+  if(checked.length===0) return alert('Pick at least one domain.');
+  runQueue = checked;
   nextDomain();
 }
 
 function nextDomain(){
   if(runQueue.length===0){ finalizeSession(); return; }
-  const d = runQueue.shift();
-  renderDomainForm(d);
+  const domain = runQueue.shift();
+  renderDomainForm(domain);
 }
 
 function renderDomainForm(domain){
   const cfg = DOMAINS[domain];
-  const ui = document.getElementById('ui');
-  let qs = '';
+  let qs='';
   for(let i=1;i<=cfg.items;i++){
-    qs += `
-      <label>Q${i} <select id="q-${domain}-${i}">
-        <option value="1">1</option><option value="2">2</option>
-        <option value="3" selected>3</option>
-        <option value="4">4</option><option value="5">5</option>
-      </select></label>`;
+    qs += `<label>Q${i}
+              <select id="q-${domain}-${i}">
+                <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option>
+              </select>
+           </label>`;
   }
   ui.innerHTML = `
     <div class="card">
-      <div class="center" style="justify-content:space-between">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <h2>${domain}</h2>
         <span class="mini">Progress: ${Object.keys(DOMAINS).indexOf(domain)+1} / ${Object.keys(DOMAINS).length}</span>
       </div>
       <div class="grid">${qs}</div>
-      <div style="margin-top:12px" class="center" >
-        <button onclick="scoreDomain('${domain}')">Score domain</button>
-      </div>
+      <div style="margin-top:12px"><button onclick="scoreDomain('${domain}')">Score domain</button></div>
     </div>`;
 }
 
-const sessionResults = [];
-
 function scoreDomain(domain){
   const cfg = DOMAINS[domain];
-  // Collect ratings
-  const ratings = [];
-  for(let i=1;i<=cfg.items;i++){
-    ratings.push(Number(document.getElementById(`q-${domain}-${i}`).value));
-  }
+  const ratings=[]; for(let i=1;i<=cfg.items;i++){ ratings.push(Number(document.getElementById(`q-${domain}-${i}`).value)); }
   const n = ratings.length;
   const avg = ratings.reduce((a,b)=>a+b,0)/n;
   const cov = ratings.filter(x=>x>=4).length/n;
   const lowCount = ratings.filter(x=>x<=2).length;
   const plow = lowCount/n;
-  const lavg = LAVG(avg);
-  const lcov = LCOV(cov);
-  const llow = LLOW(plow);
-  let provisional = Math.min(lavg, lcov, llow);
+  const lavg=LAVG(avg), lcov=LCOV(cov), llow=LLOW(plow);
+  const provisional = Math.min(lavg,lcov,llow);
+  const cont = contingencyUpgrade({avg,cov,plow,lavg,lcov,llow});
+  const finalLevel = cont ? Math.max(provisional, cont) : provisional;
 
-  // Contingency (internal)
-  const c = contingencyUpgrade({avg,cov,plow,lavg,lcov,llow});
-  const finalLevel = c ? Math.max(provisional, c) : provisional;
-
-  // Group averages for radar
-  const groupScores = {};
+  // group averages
+  const groupScores={};
   for(const [g,idxs] of Object.entries(cfg.groups)){
-    const vals = idxs.map(i=>ratings[i-1]||0);
-    groupScores[g] = vals.reduce((a,b)=>a+b,0)/vals.length;
+    const vals = idxs.map(i=>ratings[i-1]);
+    groupScores[g]= vals.reduce((a,b)=>a+b,0)/vals.length;
   }
 
-  sessionResults.push({domain, ratings, avg, cov, lowCount, plow, lavg, lcov, llow, provisional, contingency:c, finalLevel, groupScores});
-
-  // Render report card for this domain
-  renderDomainReportCard(sessionResults[sessionResults.length-1]);
-
-  // Move on
+  sessionResults.push({domain,ratings,avg,cov,lowCount,plow,lavg,lcov,llow,provisional,contingency:cont,finalLevel,groupScores});
+  renderDomainReportCard(sessionResults.at(-1));
   nextDomain();
 }
 
 function renderDomainReportCard(res){
-  const box = document.createElement('div');
-  box.className='card';
-  const t = LEVEL_TEXT[res.domain][res.finalLevel];
-  box.innerHTML = `
-    <h3>${res.domain} — <span class="lvl">Level ${res.finalLevel}</span> <span class="mini">(${t?.t||''})</span></h3>
-    <p class="mini">${t?.d||''}</p>
+  const card = document.createElement('div');
+  card.className='card';
+  const meta = LEVEL_TEXT[res.domain][res.finalLevel] || {t:`Level ${res.finalLevel}`, d:''};
+  const canvasId = `radar-${res.domain.replace(/\s/g,'')}-${Math.random().toString(36).slice(2)}`;
+  card.innerHTML = `
+    <h3>${res.domain} — <b>${meta.t}</b></h3>
+    <p class="mini">${meta.d}</p>
     <div class="grid">
       <div>
         <table>
           <tr><th>Average</th><td>${res.avg.toFixed(2)}</td></tr>
           <tr><th>Coverage (≥4)</th><td>${(res.cov*100).toFixed(0)}%</td></tr>
           <tr><th>Low (≤2)</th><td>${res.lowCount}/${res.ratings.length} (${(res.plow*100).toFixed(0)}%)</td></tr>
+          <tr><th>Final Level</th><td><b>${res.finalLevel}</b></td></tr>
         </table>
       </div>
-      <div>
-        <canvas id="radar-${res.domain.replace(/\s/g,'')}" width="340" height="260"></canvas>
-      </div>
-    </div>
-    <div class="mini" style="margin-top:8px">Group insights are based on group averages vs. others in-domain.</div>
-  `;
-  document.getElementById('reports').appendChild(box);
-  drawRadar(`radar-${res.domain.replace(/\s/g,'')}`, res.groupScores);
+      <div><canvas id="${canvasId}" width="340" height="260"></canvas></div>
+    </div>`;
+  reports.appendChild(card);
+  drawRadar(canvasId,res.groupScores);
 }
 
-function drawRadar(canvasId, groups){
-  const labels = Object.keys(groups);
-  const data = Object.values(groups);
-  const ctx = document.getElementById(canvasId);
-  new Chart(ctx, {
-    type: 'radar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Group Avg (1–5)',
-        data,
-        backgroundColor: 'rgba(75, 132, 255, 0.25)',
-        borderColor: '#4aa8ff',
-        pointBackgroundColor: '#7b6cff'
-      }]
-    },
-    options: {
-      scales: {
-        r: {
-          min: 1, max: 5, ticks: { stepSize: 1, color:'#a8b3c5' },
-          grid: { color:'#22304b' }, angleLines: { color:'#22304b' },
-          pointLabels: { color:'#e6edf6', font:{size:12} }
-        }
-      },
-      plugins: { legend: { display:false } }
-    }
-  });
+function drawRadar(id, groupScores){
+  const labels = Object.keys(groupScores);
+  const data = Object.values(groupScores);
+  new Chart(document.getElementById(id),{
+    type:'radar',
+    data:{labels,
+      datasets:[{label:'Group Avg (1–5)',data,
+        backgroundColor:'rgba(123,108,255,0.25)',borderColor:'#7b6cff',pointBackgroundColor:'#7b6cff'}]},
+    options:{plugins:{legend:{display:false}},
+      scales:{r:{min:1,max:5,ticks:{stepSize:1,color:'#a8b3c5'},grid:{color:'#22304b'},
+      angleLines:{color:'#22304b'},pointLabels:{color:'#e6edf6',font:{size:12}}}}}
+  );
 }
 
 function finalizeSession(){
-  const ui = document.getElementById('ui');
   ui.innerHTML = `
     <div class="card">
       <h2>Executive summary</h2>
       ${summaryTable(sessionResults)}
-      <div class="center" style="gap:8px;margin-top:8px">
+      <div style="margin-top:8px" class="grid">
         <button class="outline" onclick="exportPDF()">Export as PDF</button>
         <button class="outline" onclick="exportCSV()">Export as CSV</button>
         <button class="outline" onclick="exportMD()">Export as Markdown</button>
       </div>
     </div>`;
-  // Optionally send silent email (requires backend)
-  // sendSilentEmail(sessionResults).catch(()=>{});
 }
 
 function summaryTable(results){
-  return `
-    <table>
-      <tr><th>Domain</th><th>Final Level</th></tr>
-      ${results.map(r=>`<tr><td>${r.domain}</td><td><b>${r.finalLevel}</b></td></tr>`).join('')}
-    </table>`;
+  return `<table><tr><th>Domain</th><th>Final Level</th></tr>${
+    results.map(r=>`<tr><td>${r.domain}</td><td><b>${r.finalLevel}</b></td></tr>`).join('')
+  }</table>`;
 }
 
-/* ================================
-   EXPORTS + EMAIL (stub)
-==================================*/
-
+/* ---------- Exports ---------- */
 async function exportPDF(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({unit:'pt',format:'a4'});
   const node = document.body;
   const canvas = await html2canvas(node,{scale:2,backgroundColor:'#0b0f14'});
   const img = canvas.toDataURL('image/png');
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const ratio = Math.min(pageWidth/canvas.width, pageHeight/canvas.height);
-  const w = canvas.width*ratio, h = canvas.height*ratio;
-  pdf.addImage(img,'PNG', (pageWidth-w)/20, 20, w*0.95, h*0.95);
+  const w = pdf.internal.pageSize.getWidth();
+  const h = pdf.internal.pageSize.getHeight();
+  const ratio = Math.min(w/canvas.width, h/canvas.height);
+  const iw = canvas.width*ratio, ih = canvas.height*ratio;
+  pdf.addImage(img,'PNG',(w-iw)/2,20,iw,ih);
   pdf.save('Learning-Maturity-Report.pdf');
-  // await sendSilentEmail(sessionResults); // enable when backend ready
 }
-
 function exportCSV(){
-  const rows = [['Domain','Average','Coverage','Low%','Final Level']];
-  sessionResults.forEach(r=>{
-    rows.push([r.domain, r.avg.toFixed(2), (r.cov*100).toFixed(0)+'%', (r.plow*100).toFixed(0)+'%', r.finalLevel]);
-  });
-  const csv = rows.map(r=>r.join(',')).join('\n');
-  downloadText(csv,'Learning-Maturity-Report.csv','text/csv');
+  const rows=[['Domain','Average','Coverage','Low%','Final Level']];
+  sessionResults.forEach(r=>rows.push([r.domain,r.avg.toFixed(2),(r.cov*100).toFixed(0)+'%',(r.plow*100).toFixed(0)+'%',r.finalLevel]));
+  const csv=rows.map(r=>r.join(',')).join('\n'); download('Learning-Maturity-Report.csv',csv,'text/csv');
 }
-
 function exportMD(){
-  let md = `# Learning Maturity Report\n\n| Domain | Avg | Coverage | Low% | Final Level |\n|---|---:|---:|---:|---:|\n`;
-  sessionResults.forEach(r=>{
-    md += `| ${r.domain} | ${r.avg.toFixed(2)} | ${(r.cov*100).toFixed(0)}% | ${(r.plow*100).toFixed(0)}% | ${r.finalLevel} |\n`;
-  });
-  downloadText(md,'Learning-Maturity-Report.md','text/markdown');
+  let md='# Learning Maturity Report\n\n| Domain | Avg | Coverage | Low% | Final |\n|---|---:|---:|---:|---:|\n';
+  sessionResults.forEach(r=>{md+=`| ${r.domain} | ${r.avg.toFixed(2)} | ${(r.cov*100).toFixed(0)}% | ${(r.plow*100).toFixed(0)}% | ${r.finalLevel} |\n`});
+  download('Learning-Maturity-Report.md',md,'text/markdown');
 }
-
-function downloadText(text, name, type){
-  const blob = new Blob([text], {type});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name; a.click();
-  URL.revokeObjectURL(a.href);
+function download(name,text,type){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); URL.revokeObjectURL(a.href);
 }
-
-// Server-side email hook (optional)
-async function sendSilentEmail(payload){
-  // Replace with your endpoint (Node/Cloudflare/Zapier/etc.)
-  // return fetch('https://your-server.example.com/email-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:'cade.wilson@gomindspring.com', payload})});
-  return Promise.resolve(); // no-op by default
-}
-
-/* ================================
-   DESCRIPTIONS SOURCE
-   (kept minimal here; you already vetted text)
-==================================*/
-const lvlDescriptions = {}; // not used directly in this minimal embed; LEVEL_TEXT holds summaries
-
 </script>
 </body>
 </html>
+
